@@ -1,0 +1,219 @@
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --border: #2a2d3e;
+  --text: #e2e8f0;
+  --muted: #8892a4;
+  --accent: #6366f1;
+  --success: #22c55e;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --radius: 12px;
+  --font: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ── Base ──────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── Layout ────────────────────────────────────────────────── */
+.app-main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+.app-header { text-align: center; margin-bottom: 2.5rem; }
+.app-header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+.app-header p { color: var(--muted); max-width: 600px; margin: 0 auto; }
+.app-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .app-layout { grid-template-columns: 1fr; }
+}
+
+/* ── Card / Surface ────────────────────────────────────────── */
+.payment-form,
+.payment-result,
+.adapter-diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+}
+
+/* ── Form ──────────────────────────────────────────────────── */
+.payment-form h2 { font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--text); }
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+.form-group label { font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.form-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; }
+
+input, select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  transition: border-color 0.2s;
+  width: 100%;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.error { color: var(--error); font-size: 0.78rem; }
+.error-banner {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--error);
+}
+
+/* ── Provider Pills ────────────────────────────────────────── */
+.provider-pills { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.provider-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.provider-pill input { display: none; }
+.provider-pill:hover { border-color: var(--provider-color, var(--accent)); }
+.provider-pill.active {
+  border-color: var(--provider-color, var(--accent));
+  background: color-mix(in srgb, var(--provider-color, var(--accent)) 12%, transparent);
+  color: var(--provider-color, var(--accent));
+}
+
+/* ── Submit Button ─────────────────────────────────────────── */
+button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: opacity 0.2s, transform 0.1s;
+  background: var(--accent);
+}
+button[type="submit"]:hover { opacity: 0.9; }
+button[type="submit"]:active { transform: scale(0.99); }
+button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Payment Result ────────────────────────────────────────── */
+.payment-result { margin-top: 1.5rem; }
+.payment-result.success { border-color: rgba(34, 197, 94, 0.4); }
+.payment-result.failed  { border-color: rgba(239, 68, 68, 0.4); }
+.payment-result.pending { border-color: rgba(245, 158, 11, 0.4); }
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.result-icon { font-size: 2.5rem; }
+.result-header h3 { font-size: 1.1rem; }
+.result-provider { font-size: 0.85rem; font-weight: 600; }
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.result-field { display: flex; flex-direction: column; gap: 0.2rem; }
+.result-field label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.result-field code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+  word-break: break-all;
+}
+
+.toggle-raw-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  width: auto;
+  margin-top: 0.5rem;
+  transition: all 0.2s;
+}
+.toggle-raw-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.raw-response {
+  margin-top: 0.75rem;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #a3e635;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+}
+
+/* ── Adapter Diagram ───────────────────────────────────────── */
+.adapter-diagram h3 { font-size: 1rem; margin-bottom: 1.25rem; }
+.diagram-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.diagram-node {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  text-align: center;
+  gap: 0.15rem;
+}
+.node-label { font-weight: 700; font-size: 0.9rem; }
+.node-desc { font-size: 0.75rem; color: var(--muted); font-family: var(--font-mono); }
+.node-sub { font-size: 0.7rem; color: var(--muted); }
+
+.frontend-node { border-color: #6366f1; background: rgba(99,102,241,0.07); }
+.bff-node       { border-color: #22d3ee; background: rgba(34,211,238,0.07); }
+.backend-node   { border-color: #86efac; background: rgba(134,239,172,0.07); }
+.provider-node  { border-color: #fbbf24; background: rgba(251,191,36,0.07); }
+
+.diagram-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.3rem 0;
+}
+.arrow-label { font-size: 0.7rem; font-weight: 700; color: var(--accent); }
+.arrow-line { font-size: 1.2rem; color: var(--muted); }
+.arrow-sub { font-size: 0.65rem; color: var(--muted); font-family: var(--font-mono); white-space: pre; text-align: center; }
