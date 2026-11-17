@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { paymentApiAdapter } from '../adapters/paymentApiAdapter.ts';
+import { paymentApiAdapter } from '../adapters/paymentApiAdapter';
 import type {
   PaymentRequest,
   PaymentResponse,

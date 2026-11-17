@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { usePayment, useProviders } from '../../hooks/usePayment.ts';
-import type { PaymentRequest, PaymentProvider } from '../../types/payment.types.tsx';
-import PaymentResult from './PaymentResult.tsx';
+import { usePayment, useProviders } from '../../hooks/usePayment';
+import type { PaymentRequest, PaymentProvider } from '../../types/payment.types';
+import PaymentResult from './PaymentResult';
 
 /**
  * PaymentForm — purely presentational component.

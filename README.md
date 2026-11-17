@@ -2,7 +2,7 @@
 
 A production-style demonstration of the **Adapter Design Pattern** across three
 technology layers: **Spring Boot + Gradle** (Java backend), **Node.js** (BFF), and
-**React + TypeScript** (frontend).
+**React + TypeScript + Vite** (frontend).
 
 ---
 
@@ -96,8 +96,10 @@ adapter-pattern-demo/
 │       └── middleware/
 │           └── errorHandler.js
 │
-├── frontend/                         ← React + TypeScript (CRA)
+├── frontend/                         ← React + TypeScript (Vite)
 │   ├── package.json
+│   ├── vite.config.ts                   ← Vite + dev API proxy
+│   ├── index.html                       ← Vite entry point
 │   ├── Dockerfile
 │   └── src/
 │       ├── App.tsx
@@ -153,7 +155,7 @@ adapter-pattern-demo/
 
 ### Prerequisites
 - Java 17+, Gradle 8+
-- Node.js 20+
+- Node.js 22.12+ for the Vite frontend (Node.js 20 is still supported by the BFF)
 - Docker + Docker Compose (optional)
 
 ### Option 1 — Docker Compose (all services)
@@ -180,7 +182,7 @@ curl http://localhost:4000/api/payments/providers
 
 ### Option 2 — Manual (3 terminals)
 
-For the BFF, copy `bff/.env.example` to `bff/.env` and adjust `BACKEND_URL` if needed. The `.env` file is deliberately ignored by Git. When using Create React App's development server, `frontend/package.json` proxies relative `/api` requests to the BFF; keep the ports separate (React 4000, BFF 3000).
+For the BFF, copy `bff/.env.example` to `bff/.env` and adjust `BACKEND_URL` if needed. The `.env` file is deliberately ignored by Git. When using Vite's development server, `frontend/vite.config.ts` proxies relative `/api` requests to the BFF; keep the ports separate (React 4000, BFF 3000).
 
 **Terminal 1 — Spring Boot**
 ```bash
@@ -200,9 +202,9 @@ npm run dev
 **Terminal 3 — React Frontend**
 ```bash
 cd frontend
-npm install
-PORT=4000 npm start
-# Starts on http://localhost:4000, with /api proxied to the BFF on port 3000
+npm ci
+npm run dev
+# Vite serves http://localhost:4000, with /api proxied to the BFF on port 3000
 ```
 
 ---
@@ -227,7 +229,7 @@ cd frontend
 npm ci
 npm run build
 ```
-There are currently no frontend component tests. The CI build verifies TypeScript/React compilation.
+There are currently no frontend component tests. `npm run build` performs a TypeScript type check and Vite bundle build.
 
 ---
 
