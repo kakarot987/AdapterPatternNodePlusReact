@@ -42,13 +42,12 @@ class PaymentServiceValidationTest {
 
     @Test
     void rejectsMissingSdkFieldsBeforeProviderLookup() {
-        PaymentRequest request = valid();
-        request.setDescription(null);
-        assertThatThrownBy(() -> service.processPayment(request))
+        PaymentRequest missingDescription = valid();
+        missingDescription.setDescription(null);
+        assertThatThrownBy(() -> service.processPayment(missingDescription))
                 .isInstanceOf(IllegalArgumentException.class);
-        request = valid();
-        request.setOrderId(null);
-        PaymentRequest missingOrder = request;
+        PaymentRequest missingOrder = valid();
+        missingOrder.setOrderId(null);
         assertThatThrownBy(() -> service.processPayment(missingOrder))
                 .isInstanceOf(IllegalArgumentException.class);
         verifyNoInteractions(factory);
