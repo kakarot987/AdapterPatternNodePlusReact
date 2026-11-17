@@ -1,0 +1,31 @@
+name: Temporary test lockfile generator
+on:
+  push:
+    branches: [test/vite-frontend-regressions]
+permissions:
+  contents: write
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate lockfile and validate installation
+        working-directory: frontend
+        run: |
+          rm package-lock.json
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm ci --no-audit --no-fund
+      - name: Commit lockfile
+        run: |
+          git add frontend/package-lock.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore(frontend): regenerate Vitest dependencies lockfile"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
