@@ -1,6 +1,6 @@
 import React from 'react';
-import PaymentForm from '../components/payment/PaymentForm.tsx';
-import AdapterDiagram from '../components/ui/AdapterDiagram.tsx';
+import PaymentForm from '../components/payment/PaymentForm';
+import AdapterDiagram from '../components/ui/AdapterDiagram';
 
 const HomePage: React.FC = () => (
   <main className="app-main">
