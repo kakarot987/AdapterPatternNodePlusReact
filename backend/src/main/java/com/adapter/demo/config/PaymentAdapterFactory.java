@@ -1,63 +1,50 @@
 package com.adapter.demo.config;
 
 import com.adapter.demo.port.PaymentPort;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * ============================================================
- *  ADAPTER FACTORY / REGISTRY
- * ============================================================
- * Collects all PaymentPort implementations from the Spring
- * context and provides a lookup by provider name.
+ * Registry of provider-specific adapters.
  *
- * This is the "Context" in the classic Adapter/Strategy combo:
- * the client asks for an adapter by name at runtime, and the
- * factory returns the right one — the caller never needs to
- * know which concrete adapter is being used.
- *
- * Benefits:
- *  ✔  Open/Closed: add a new provider by adding a new Adapter
- *     class + zero changes here
- *  ✔  Single Responsibility: routing logic is centralised
- *  ✔  Testable: each adapter tested in isolation
- * ============================================================
+ * Spring injects all PaymentPort implementations. Building the immutable
+ * lookup during construction avoids lazy initialization races and makes
+ * provider discovery work before any payment request is processed.
  */
 @Component
-@RequiredArgsConstructor
 public class PaymentAdapterFactory {
 
-    private final List<PaymentPort> adapters;
+    private final Map<String, PaymentPort> adapterMap;
 
-    /** Lazy-built lookup map: "stripe" → StripePaymentAdapter, etc. */
-    private Map<String, PaymentPort> adapterMap;
+    public PaymentAdapterFactory(List<PaymentPort> adapters) {
+        this.adapterMap = adapters.stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        adapter -> adapter.getProviderName().toLowerCase(Locale.ROOT),
+                        Function.identity()
+                ));
+    }
 
     public PaymentPort getAdapter(String providerName) {
-        if (adapterMap == null) {
-            adapterMap = adapters.stream()
-                    .collect(Collectors.toMap(
-                            a -> a.getProviderName().toLowerCase(),
-                            Function.identity()
-                    ));
+        if (providerName == null || providerName.isBlank()) {
+            throw new IllegalArgumentException("Payment provider must be specified");
         }
 
-        PaymentPort adapter = adapterMap.get(providerName.toLowerCase());
+        PaymentPort adapter = adapterMap.get(providerName.toLowerCase(Locale.ROOT));
         if (adapter == null) {
             throw new IllegalArgumentException(
                     "No payment adapter registered for provider: '" + providerName + "'. " +
-                    "Available providers: " + adapterMap.keySet()
+                    "Available providers: " + getAvailableProviders()
             );
         }
         return adapter;
     }
 
     public List<String> getAvailableProviders() {
-        if (adapterMap == null) getAdapter("__init__");
-        return List.copyOf(adapterMap.keySet());
+        return adapterMap.keySet().stream().sorted().toList();
     }
 }
