@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { usePayment, useProviders } from '../../hooks/usePayment';
-import type { PaymentRequest, PaymentProvider } from '../../types/payment.types';
+import type { PaymentRequest } from '../../types/payment.types';
 import PaymentResult from './PaymentResult';
 
 /**
@@ -11,7 +11,7 @@ import PaymentResult from './PaymentResult';
  */
 const PaymentForm: React.FC = () => {
   const { response, loading, error, processPayment, reset } = usePayment();
-  const { providers, fetchProviders } = useProviders();
+  const { providers, loading: providersLoading, error: providersError, fetchProviders } = useProviders();
 
   const {
     register,
@@ -44,6 +44,15 @@ const PaymentForm: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="payment-form">
         <h2>Process Payment</h2>
 
+        {providersError && (
+          <div className="error-banner" role="alert">
+            Unable to load payment providers: {providersError}{' '}
+            <button type="button" onClick={() => void fetchProviders()}>
+              Retry providers
+            </button>
+          </div>
+        )}
+
         {/* Provider Selector */}
         <div className="form-group">
           <label>Payment Provider</label>
@@ -64,8 +73,9 @@ const PaymentForm: React.FC = () => {
 
         {/* Order ID */}
         <div className="form-group">
-          <label>Order ID</label>
+          <label htmlFor="order-id">Order ID</label>
           <input
+            id="order-id"
             {...register('orderId', { required: 'Order ID is required' })}
             placeholder="order_12345"
           />
@@ -75,8 +85,9 @@ const PaymentForm: React.FC = () => {
         {/* Amount + Currency */}
         <div className="form-row">
           <div className="form-group">
-            <label>Amount</label>
+            <label htmlFor="payment-amount">Amount</label>
             <input
+              id="payment-amount"
               type="number"
               step="0.01"
               {...register('amount', {
@@ -89,8 +100,8 @@ const PaymentForm: React.FC = () => {
             {errors.amount && <span className="error">{errors.amount.message}</span>}
           </div>
           <div className="form-group">
-            <label>Currency</label>
-            <select {...register('currency')}>
+            <label htmlFor="payment-currency">Currency</label>
+            <select id="payment-currency" {...register('currency')}>
               <option value="USD">USD</option>
               <option value="EUR">EUR</option>
               <option value="INR">INR</option>
@@ -101,8 +112,9 @@ const PaymentForm: React.FC = () => {
 
         {/* Email */}
         <div className="form-group">
-          <label>Customer Email</label>
+          <label htmlFor="customer-email">Customer Email</label>
           <input
+            id="customer-email"
             type="email"
             {...register('customerEmail', {
               required: 'Email is required',
@@ -117,16 +129,18 @@ const PaymentForm: React.FC = () => {
 
         {/* Description */}
         <div className="form-group">
-          <label>Description</label>
+          <label htmlFor="payment-description">Description</label>
           <input
+            id="payment-description"
             {...register('description', { required: 'Description is required' })}
             placeholder="Premium subscription"
           />
+          {errors.description && <span className="error">{errors.description.message}</span>}
         </div>
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || providersLoading || Boolean(providersError)}
           style={{ backgroundColor: selectedMeta?.color }}
         >
           {loading
@@ -136,7 +150,7 @@ const PaymentForm: React.FC = () => {
       </form>
 
       {error && (
-        <div className="error-banner">
+        <div className="error-banner" role="alert">
           ❌ {error}
         </div>
       )}

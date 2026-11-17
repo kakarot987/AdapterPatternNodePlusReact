@@ -85,6 +85,7 @@ export function useProviders() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchProviders = async () => {
+    setError(null);
     setLoading(true);
     try {
       const data = await paymentApiAdapter.getProviders();
