@@ -60,7 +60,7 @@ describe('PaymentForm', () => {
   it('submits a validated unified request and shows its result', async () => {
     const user = userEvent.setup();
     render(<PaymentForm />);
-    await screen.findByRole('button', { name: /pay with stripe/i });
+    await waitFor(() => expect(screen.getByRole('button', { name: /pay with stripe/i })).toBeEnabled());
     await completeForm(user);
     await user.click(screen.getByRole('button', { name: /pay with stripe/i }));
 
@@ -79,7 +79,7 @@ describe('PaymentForm', () => {
   it('rejects invalid fields without calling the payment API', async () => {
     const user = userEvent.setup();
     render(<PaymentForm />);
-    await screen.findByRole('button', { name: /pay with stripe/i });
+    await waitFor(() => expect(screen.getByRole('button', { name: /pay with stripe/i })).toBeEnabled());
     await user.click(screen.getByRole('button', { name: /pay with stripe/i }));
 
     expect(await screen.findByText(/amount is required/i)).toBeInTheDocument();
@@ -90,7 +90,7 @@ describe('PaymentForm', () => {
     mocked.processPayment.mockRejectedValue(new Error('Backend temporarily unavailable'));
     const user = userEvent.setup();
     render(<PaymentForm />);
-    await screen.findByRole('button', { name: /pay with stripe/i });
+    await waitFor(() => expect(screen.getByRole('button', { name: /pay with stripe/i })).toBeEnabled());
     await completeForm(user);
     await user.click(screen.getByRole('button', { name: /pay with stripe/i }));
 
@@ -107,7 +107,7 @@ describe('PaymentForm', () => {
 
     await user.click(screen.getByRole('button', { name: /retry providers/i }));
     await waitFor(() => expect(mocked.getProviders).toHaveBeenCalledTimes(2));
-    expect(await screen.findByRole('button', { name: /pay with stripe/i })).toBeEnabled();
+    await waitFor(() => expect(screen.getByRole('button', { name: /pay with stripe/i })).toBeEnabled());
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });
