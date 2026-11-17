@@ -27,7 +27,8 @@ import type {
  */
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_BFF_URL || 'http://localhost:3000',
+  // Use relative URLs: CRA's dev proxy and production Nginx route /api to the BFF.
+  baseURL: process.env.REACT_APP_BFF_URL || '',
   timeout: 10_000,
   headers: { 'Content-Type': 'application/json' },
 });

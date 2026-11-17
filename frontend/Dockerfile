@@ -1,16 +1,16 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-ARG REACT_APP_BFF_URL=http://localhost:3000
-ENV REACT_APP_BFF_URL=$REACT_APP_BFF_URL
-
-COPY package.json ./
-RUN npm install --omit=dev --legacy-peer-deps
+COPY package*.json ./
+# CRA 5's peer range conflicts with the existing TypeScript 5 lockfile.
+# Match the tested CI installation while keeping dependencies available to build.
+RUN npm ci --legacy-peer-deps --no-audit --no-fund
 
 COPY . .
 RUN npm run build
 
 FROM nginx:alpine
 COPY --from=builder /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

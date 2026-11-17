@@ -159,15 +159,28 @@ adapter-pattern-demo/
 ### Option 1 — Docker Compose (all services)
 ```bash
 docker-compose up --build
-# Frontend → http://localhost:4000
-# BFF      → http://localhost:3000
-# Backend  → http://localhost:8080
+# Frontend → http://localhost:4000 (UI + same-origin /api)
+# BFF      → http://localhost:3000 (direct access, for debugging)
+# Backend  → http://localhost:8080 (direct access, for debugging)
 # Swagger  → http://localhost:8080/swagger-ui.html
+```
+
+The production-like Docker setup has a frontend Nginx reverse proxy: the browser
+calls `/api/payments/*` on port **4000**, Nginx forwards those calls to the BFF,
+and the BFF calls Spring Boot over the internal Docker network. No wildcard
+browser CORS permissions or compiled `localhost:3000` BFF URL are needed.
+Spring Boot Actuator exposes `/actuator/health` for the backend readiness check.
+
+Quick verification after startup:
+
+```bash
+curl http://localhost:8080/actuator/health
+curl http://localhost:4000/api/payments/providers
 ```
 
 ### Option 2 — Manual (3 terminals)
 
-For the BFF, copy `bff/.env.example` to `bff/.env` and adjust `BACKEND_URL` if needed. The `.env` file is deliberately ignored by Git.
+For the BFF, copy `bff/.env.example` to `bff/.env` and adjust `BACKEND_URL` if needed. The `.env` file is deliberately ignored by Git. When using Create React App's development server, `frontend/package.json` proxies relative `/api` requests to the BFF; keep the ports separate (React 4000, BFF 3000).
 
 **Terminal 1 — Spring Boot**
 ```bash
@@ -188,8 +201,8 @@ npm run dev
 ```bash
 cd frontend
 npm install
-npm start
-# Starts on http://localhost:4000 (or 3001 if 3000 is taken)
+PORT=4000 npm start
+# Starts on http://localhost:4000, with /api proxied to the BFF on port 3000
 ```
 
 ---
