@@ -13,12 +13,15 @@ jobs:
           ref: ${{ github.ref_name }}
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
       - name: Generate lockfile and validate installation
         working-directory: frontend
         run: |
           rm -f package-lock.json
-          npm install --no-audit --no-fund
+          npm install --no-audit --no-fund || {
+            tail -n 130 /home/runner/.npm/_logs/*debug-0.log
+            exit 1
+          }
           npm ci --no-audit --no-fund
       - name: Commit lockfile
         run: |
