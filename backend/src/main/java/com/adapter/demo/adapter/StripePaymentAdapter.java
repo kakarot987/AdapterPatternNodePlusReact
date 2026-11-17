@@ -3,6 +3,7 @@ package com.adapter.demo.adapter;
 import com.adapter.demo.model.PaymentRequest;
 import com.adapter.demo.model.PaymentResponse;
 import com.adapter.demo.port.PaymentPort;
+import com.adapter.demo.util.PaymentAmounts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,7 @@ public class StripePaymentAdapter implements PaymentPort {
         log.info("[StripeAdapter] Adapting payment request for Stripe...");
 
         // ADAPTATION: convert dollars to cents
-        long amountInCents = Math.round(request.getAmount() * 100);
+        long amountInCents = PaymentAmounts.minorUnits(request.getAmount());
 
         // ADAPTATION: map our model to Stripe's expected params
         Map<String, Object> stripeResponse = stripeSdk.createCharge(
@@ -55,7 +56,7 @@ public class StripePaymentAdapter implements PaymentPort {
     public PaymentResponse refundPayment(String transactionId, double amount) {
         log.info("[StripeAdapter] Adapting refund for Stripe...");
 
-        long amountInCents = Math.round(amount * 100);
+        long amountInCents = PaymentAmounts.minorUnits(amount);
         Map<String, Object> refundResponse = stripeSdk.createRefund(transactionId, amountInCents);
 
         return PaymentResponse.builder()

@@ -3,6 +3,7 @@ package com.adapter.demo.adapter;
 import com.adapter.demo.model.PaymentRequest;
 import com.adapter.demo.model.PaymentResponse;
 import com.adapter.demo.port.PaymentPort;
+import com.adapter.demo.util.PaymentAmounts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class RazorpayPaymentAdapter implements PaymentPort {
         log.info("[RazorpayAdapter] Adapting payment request for Razorpay...");
 
         // ADAPTATION: Razorpay uses paise (like cents for INR)
-        int amountInPaise = (int) Math.round(request.getAmount() * 100);
+        int amountInPaise = PaymentAmounts.intMinorUnits(request.getAmount());
 
         // ADAPTATION: Razorpay uses a "notes" map for extra fields
         Map<String, String> notes = Map.of(
@@ -58,7 +59,7 @@ public class RazorpayPaymentAdapter implements PaymentPort {
     public PaymentResponse refundPayment(String transactionId, double amount) {
         log.info("[RazorpayAdapter] Adapting refund for Razorpay...");
 
-        int amountInPaise = (int) Math.round(amount * 100);
+        int amountInPaise = PaymentAmounts.intMinorUnits(amount);
         Map<String, Object> refundResponse = razorpaySdk.createRefund(transactionId, amountInPaise);
 
         return PaymentResponse.builder()
