@@ -17,8 +17,8 @@ jobs:
       - name: Generate lockfile and validate installation
         working-directory: frontend
         run: |
-          rm package-lock.json
-          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
           npm ci --no-audit --no-fund
       - name: Commit lockfile
         run: |
