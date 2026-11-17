@@ -1,0 +1,25 @@
+name: Docker Compose smoke test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  compose-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start all services
+        run: docker compose up --build --detach --wait --wait-timeout 300
+      - name: Verify backend health and same-origin API routing
+        run: |
+          curl --fail --silent --show-error --retry 15 --retry-all-errors --retry-delay 2 http://127.0.0.1:8080/actuator/health | grep -q '"status":"UP"'
+          curl --fail --silent --show-error --retry 15 --retry-all-errors --retry-delay 2 http://127.0.0.1:4000/api/payments/providers | grep -q '"providers"'
+          curl --fail --silent --show-error http://127.0.0.1:4000/ | grep -qi 'html'
+      - name: Print service logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop services
+        if: always()
+        run: docker compose down --volumes
