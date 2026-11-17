@@ -112,9 +112,10 @@ public class PayPalPaymentAdapter implements PaymentPort {
 
     /** PayPal → unified status mapping */
     private String mapStatus(String paypalStatus) {
+        if (paypalStatus == null) return "UNKNOWN";
         return switch (paypalStatus) {
-            case "COMPLETED", "APPROVED" -> "SUCCESS";
-            case "PENDING", "CREATED"    -> "PENDING";
+            case "COMPLETED" -> "SUCCESS";
+            case "PENDING", "CREATED", "APPROVED" -> "PENDING";
             case "VOIDED", "DENIED"      -> "FAILED";
             default                       -> "UNKNOWN";
         };

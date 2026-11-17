@@ -18,9 +18,12 @@ const validate = (req, res, next) => {
 router.post(
   '/process',
   [
-    body('orderId').notEmpty().withMessage('orderId is required'),
-    body('amount').isFloat({ gt: 0 }).withMessage('amount must be a positive number'),
-    body('currency').notEmpty().withMessage('currency is required'),
+    body('orderId').isString().trim().notEmpty().withMessage('orderId is required'),
+    body('amount').isFloat({ gt: 0 }).withMessage('amount must be a positive number')
+      .bail().custom(value => /^\d+(?:\.\d{1,2})?$/.test(String(value)))
+      .withMessage('amount must have at most two decimal places'),
+    body('currency').isString().trim().notEmpty().withMessage('currency is required'),
+    body('description').isString().trim().notEmpty().withMessage('description is required'),
     body('customerEmail').isEmail().withMessage('valid customerEmail is required'),
     body('provider')
       .notEmpty()
@@ -46,7 +49,9 @@ router.post(
   [
     param('provider').isIn(['stripe', 'paypal', 'razorpay']),
     param('transactionId').notEmpty(),
-    query('amount').isFloat({ gt: 0 }).withMessage('amount must be a positive number'),
+    query('amount').isFloat({ gt: 0 }).withMessage('amount must be a positive number')
+      .bail().custom(value => /^\d+(?:\.\d{1,2})?$/.test(String(value)))
+      .withMessage('amount must have at most two decimal places'),
   ],
   validate,
   async (req, res, next) => {
