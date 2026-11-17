@@ -104,6 +104,7 @@ public class StripePaymentAdapter implements PaymentPort {
 
     /** Stripe → unified status mapping */
     private String mapStatus(String stripeStatus) {
+        if (stripeStatus == null) return "UNKNOWN";
         return switch (stripeStatus) {
             case "succeeded" -> "SUCCESS";
             case "pending"   -> "PENDING";

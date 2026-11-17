@@ -104,6 +104,7 @@ public class RazorpayPaymentAdapter implements PaymentPort {
 
     /** Razorpay → unified status mapping */
     private String mapStatus(String rzpStatus) {
+        if (rzpStatus == null) return "UNKNOWN";
         return switch (rzpStatus) {
             case "captured", "processed" -> "SUCCESS";
             case "created", "authorized" -> "PENDING";
