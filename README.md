@@ -85,7 +85,7 @@ adapter-pattern-demo/
 │
 ├── bff/                              ← Node.js BFF (Express)
 │   ├── package.json
-│   ├── .env
+│   ├── .env.example
 │   ├── Dockerfile
 │   └── src/
 │       ├── index.js                          ← Express app entry
@@ -149,6 +149,8 @@ adapter-pattern-demo/
 
 ## 🚀 Running the Project
 
+**Demo only:** All three payment SDKs are local simulations. No real payments or refunds are processed. Amounts currently use `double` in the demo API; do not use this as production payment-processing code without exact decimal handling, request validation, security, and real provider integration.
+
 ### Prerequisites
 - Java 17+, Gradle 8+
 - Node.js 20+
@@ -164,6 +166,8 @@ docker-compose up --build
 ```
 
 ### Option 2 — Manual (3 terminals)
+
+For the BFF, copy `bff/.env.example` to `bff/.env` and adjust `BACKEND_URL` if needed. The `.env` file is deliberately ignored by Git.
 
 **Terminal 1 — Spring Boot**
 ```bash
@@ -204,11 +208,13 @@ cd bff
 npm test
 ```
 
-### Frontend (React Testing Library)
+### Frontend (build check)
 ```bash
 cd frontend
-npm test
+npm ci
+npm run build
 ```
+There are currently no frontend component tests. The CI build verifies TypeScript/React compilation.
 
 ---
 
@@ -226,16 +232,16 @@ All endpoints available via Swagger UI at `http://localhost:8080/swagger-ui.html
 ### Example — same request, different provider
 
 ```json
-// Pay with Stripe
-{ "orderId": "ord_001", "amount": 99.99, "currency": "USD",
-  "customerEmail": "user@example.com", "description": "Premium plan", "provider": "stripe" }
-
-// Pay with PayPal — change ONE field
-{ ..., "provider": "paypal" }
-
-// Pay with Razorpay — change ONE field
-{ ..., "provider": "razorpay" }
+{
+  "orderId": "ord_001",
+  "amount": 99.99,
+  "currency": "USD",
+  "customerEmail": "user@example.com",
+  "description": "Premium plan",
+  "provider": "stripe"
+}
 ```
+Change `provider` to `paypal` or `razorpay` to select a different adapter. Use a compatible currency for the provider.
 
 ---
 
@@ -253,7 +259,7 @@ Without the Adapter Pattern, `PaymentService` would be littered with `if/else` b
 With it, the service calls one unified `PaymentPort.processPayment()` and the adapters
 handle all translation. Adding a new gateway (e.g. Braintree) means:
 
-1. Write `BraintreeSdk.java` (already exists as a library)
+1. Integrate a (simulated) `BraintreeSdk.java` or other provider SDK
 2. Write `BraintreePaymentAdapter.java` (implements `PaymentPort`)
 3. **Zero changes** to `PaymentService`, `PaymentController`, or any other class ✅
 
