@@ -1,2 +1,30 @@
-backend/build/
-frontend/node_modules/
+# IDE and editor files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Gradle and Java output
+.gradle/
+**/.gradle/
+**/build/
+!**/gradle/wrapper/gradle-wrapper.jar
+**/target/
+*.class
+
+# Node/React artifacts
+**/node_modules/
+frontend/build/
+frontend/coverage/
+bff/coverage/
+npm-debug.log*
+
+# Local environment and credentials
+.env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs
+*.log
