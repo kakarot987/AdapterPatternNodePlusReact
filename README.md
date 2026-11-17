@@ -223,13 +223,14 @@ cd bff
 npm test
 ```
 
-### Frontend (build check)
+### Frontend (component tests and build)
 ```bash
 cd frontend
 npm ci
+npm test
 npm run build
 ```
-There are currently no frontend component tests. `npm run build` performs a TypeScript type check and Vite bundle build.
+`npm test` runs Vitest with React Testing Library to cover successful and failed payment submissions, form validation, provider-loading retry, and raw-response display. `npm run build` performs a TypeScript type check and Vite bundle build.
 
 ---
 
