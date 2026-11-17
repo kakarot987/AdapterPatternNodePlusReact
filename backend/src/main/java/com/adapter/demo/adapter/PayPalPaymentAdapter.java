@@ -3,6 +3,7 @@ package com.adapter.demo.adapter;
 import com.adapter.demo.model.PaymentRequest;
 import com.adapter.demo.model.PaymentResponse;
 import com.adapter.demo.port.PaymentPort;
+import com.adapter.demo.util.PaymentAmounts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class PayPalPaymentAdapter implements PaymentPort {
                         "amount", Map.of(
                                 "currency_code", request.getCurrency().toUpperCase(),
                                 // ADAPTATION: PayPal uses String amounts (not long cents)
-                                "value", String.format("%.2f", request.getAmount())
+                                "value", PaymentAmounts.formatted(request.getAmount())
                         )
                 )
         );
@@ -63,7 +64,7 @@ public class PayPalPaymentAdapter implements PaymentPort {
 
         // ADAPTATION: PayPal refund needs amount as a Map object
         Map<String, Object> amountMap = Map.of(
-                "value", String.format("%.2f", amount),
+                "value", PaymentAmounts.formatted(amount),
                 "currency_code", "USD"
         );
 

@@ -4,6 +4,7 @@ import com.adapter.demo.config.PaymentAdapterFactory;
 import com.adapter.demo.model.PaymentRequest;
 import com.adapter.demo.model.PaymentResponse;
 import com.adapter.demo.port.PaymentPort;
+import com.adapter.demo.util.PaymentAmounts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,10 +32,10 @@ public class PaymentService {
     private final PaymentAdapterFactory adapterFactory;
 
     public PaymentResponse processPayment(PaymentRequest request) {
+        validateRequest(request);
+
         log.info("Processing payment: orderId={}, provider={}, amount={}",
                 request.getOrderId(), request.getProvider(), request.getAmount());
-
-        validateRequest(request);
 
         // Resolve the correct adapter — service doesn't care which one
         PaymentPort adapter = adapterFactory.getAdapter(request.getProvider());
@@ -48,6 +49,10 @@ public class PaymentService {
     public PaymentResponse refundPayment(String provider, String transactionId, double amount) {
         log.info("Processing refund: txId={}, provider={}, amount={}", transactionId, provider, amount);
 
+        if (transactionId == null || transactionId.isBlank()) {
+            throw new IllegalArgumentException("Transaction ID is required");
+        }
+        PaymentAmounts.minorUnits(amount);
         PaymentPort adapter = adapterFactory.getAdapter(provider);
         return adapter.refundPayment(transactionId, amount);
     }
@@ -64,11 +69,24 @@ public class PaymentService {
     }
 
     private void validateRequest(PaymentRequest request) {
-        if (request.getAmount() <= 0) {
-            throw new IllegalArgumentException("Payment amount must be positive");
+        if (request == null) {
+            throw new IllegalArgumentException("Payment request is required");
         }
+        PaymentAmounts.minorUnits(request.getAmount());
         if (request.getProvider() == null || request.getProvider().isBlank()) {
             throw new IllegalArgumentException("Payment provider must be specified");
+        }
+        if (request.getOrderId() == null || request.getOrderId().isBlank()) {
+            throw new IllegalArgumentException("Order ID is required");
+        }
+        if (request.getCurrency() == null || request.getCurrency().isBlank()) {
+            throw new IllegalArgumentException("Currency is required");
+        }
+        if (request.getCustomerEmail() == null || request.getCustomerEmail().isBlank()) {
+            throw new IllegalArgumentException("Customer email is required");
+        }
+        if (request.getDescription() == null || request.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Description is required");
         }
     }
 }
